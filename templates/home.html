@@ -37,16 +37,16 @@
 <table>
 <thead>
 <tr class="table100-head">
-<th class="column1">Date</th>
-<th class="column2">Order ID</th>
-<th class="column3">Name</th>
-<th class="column4">Price</th>
-<th class="column5">Quantity</th>
-<th class="column6">Total</th>
+<th class="column1">ItemID</th>
+<th class="column2">Name</th>
+<th class="column3">Category</th>
+<th class="column4">Quantity</th>
+<th class="column5">ExpDate</th>
+<th class="column6">SupplierID</th>
 </tr>
 </thead>
 <tbody>
-{% for row in data %}
+{% for row in food_items %}
 	{% include 'table-list.html' %}
 {% endfor %}
 </tbody>
