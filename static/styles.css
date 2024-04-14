@@ -29,7 +29,7 @@
 }
 
 .main-title{
-    background-image: url('images/background-image-3.avif.png');
+    background-image: url('../static/images/background-image-3.avif.png');
     background-size: cover; /* Cover the entire container */
     background-position: center; /* Center the background image */
     height: 50vh; /* Full height of the viewport */
