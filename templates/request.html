@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Request Form</h1>
+        <form id="requestForm">
+            <div class="mb-3">
+                <label for="requesterName" class="form-label">Requester Name</label>
+                <input type="text" class="form-control" id="requesterName" name="requesterName" placeholder="Enter requester name">
+            </div>
+            <div class="mb-3">
+                <label for="requestDate" class="form-label">Request Date</label>
+                <input type="date" class="form-control" id="requestDate" name="requestDate" value="<?php echo date('Y-m-d'); ?>" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="itemID" class="form-label">Item ID</label>
+                <select class="form-select" id="itemID" name="itemID">
+                    <!-- Options will be dynamically populated using JavaScript -->
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="itemName" class="form-label">Item Name</label>
+                <input type="text" class="form-control" id="itemName" name="itemName" placeholder="Item name" readonly>
+            </div>
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Enter quantity">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fetch items from the inventory table and populate the item ID dropdown
+        fetch('/inventory')
+        .then(response => response.json())
+        .then(data => {
+            const itemIDDropdown = document.getElementById("itemID");
+            data.forEach(item => {
+                const option = document.createElement("option");
+                option.value = item.ItemID;
+                option.text = item.ItemID;
+                option.dataset.itemName = item.Name; // Set the item name as a custom data attribute
+                itemIDDropdown.appendChild(option);
+            });
+        });
+
+        // Automatically set the item name based on the selected item ID
+        document.getElementById("itemID").addEventListener("change", function() {
+            const selectedItemID = this.value;
+            const selectedItem = document.querySelector(`#itemID option[value="${selectedItemID}"]`);
+            document.getElementById("itemName").value = selectedItem ? selectedItem.dataset.itemName : '';
+        });
+    });
+</script>
+
+
+</body>
+</html>

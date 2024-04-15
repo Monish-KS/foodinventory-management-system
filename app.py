@@ -50,5 +50,14 @@ def show_fruit(id):
         return jsonify(fruit)
 
 
+@app.route("/request", methods=["GET", "POST"])
+def request_form():
+    if request.method == "GET":
+        return render_template("request.html")
+    elif request.method == "POST":
+        # Process the form submission here
+        pass
+
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0',debug=True)
