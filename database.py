@@ -36,3 +36,30 @@ def insert_into_database(data):
     except Exception as e:
         print(f"Error inserting data into database: {e}")
         return False  # Return False if an error occurs during insertion
+
+
+def insert_request_into_database(data):
+    try:
+        with engine.connect() as conn:
+            query = text(f"INSERT INTO requests (requester_name, request_date, item_id, item_name, quantity, status) VALUES ('{data['requester_name']}', '{data['request_date']}', '{data['item_id']}','{data['item_name']}', {data['quantity']}, 'pending')")
+            conn.execute(query)
+            conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error inserting data into request database: {e}")
+        return False
+
+
+def load_requests_from_db():
+    try:
+        with engine.connect() as conn:
+            
+            result = conn.execute(text(f"Select * from requests"))
+            requests = []
+            for row in result.all():
+                requests.append(dict(row._mapping))
+            print(requests)
+            return requests
+    except Exception as e:
+        print(f"Error from database: {e}")
+        return None

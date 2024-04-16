@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receiver Page</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/request/css/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="../static/inventory/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/inventory/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/inventory/animate.css">
+    <link rel="stylesheet" type="text/css" href="../static/inventory/select2.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/inventory/perfect-scrollbar.css">
+    <link rel="stylesheet" type="text/css" href="../static/inventory/util.css">
+    <link rel="stylesheet" type="text/css" href="../static/inventory/main.css">
+</head>
+<body class="body">
+    <div class="main-title">
+        <h1 class="Name">FOOD BANK INVENTORY MANAGEMENT SYSTEM</h1>
+        <h3 class="Name-2">Hello, Monish K S</h3>
+        <br>
+    </div>
+
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center mb-5">
+                    <h2 class="heading-section">Requests</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-wrap">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Requester Name</th>
+                                    <th>Request Date</th>
+                                    <th>Item ID</th>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in requests %}
+                                {% include 'table_list_for_requests.html' %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="../static/request/js/jquery.min.js"></script>
+    <script src="../static/request/js/popper.js"></script>
+    <script src="../static/request/js/bootstrap.min.js"></script>
+    <script src="../static/request/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="../static/inventory/jquery-3.2.1.min.js.download"></script>
+    <script src="../static/inventory/popper.js.download"></script>
+    <script src="../static/inventory/bootstrap.min.js.download"></script>
+    <script src="../static/inventory/select2.min.js.download"></script>
+    <script src="../static/inventory/main.js.download"></script>
+    <script async="" src="../static/inventory/js"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-23581568-13');
+    </script>
+    <script>
+
+
+
+    </script>
+</body>
+</html>

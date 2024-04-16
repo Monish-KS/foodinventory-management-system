@@ -16,7 +16,7 @@
             </div>
             <div class="mb-3">
                 <label for="requestDate" class="form-label">Request Date</label>
-                <input type="date" class="form-control" id="requestDate" name="requestDate" value="<?php echo date('Y-m-d'); ?>" readonly>
+                <input type="date" class="form-control" id="requestDate" name="requestDate" readonly>
             </div>
             <div class="mb-3">
                 <label for="itemID" class="form-label">Item ID</label>
@@ -39,6 +39,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // Set the current date in the requestDate input field
+        const currentDate = new Date().toISOString().split('T')[0];
+        document.getElementById("requestDate").value = currentDate;
+
         // Fetch items from the inventory table and populate the item ID dropdown
         fetch('/inventory')
         .then(response => response.json())
@@ -59,9 +63,69 @@
             const selectedItem = document.querySelector(`#itemID option[value="${selectedItemID}"]`);
             document.getElementById("itemName").value = selectedItem ? selectedItem.dataset.itemName : '';
         });
+
+        // Form submit event listener
+        document.getElementById("requestForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Validate the quantity field
+            const quantity = document.getElementById("quantity").value;
+            if (quantity === "") {
+                alert("Please enter a quantity.");
+                return;
+            }
+
+            // Get form data
+            var formData = new FormData(this);
+
+            // Check if quantity is included in the form data
+            if (!formData.has("quantity")) {
+                alert("Please enter a quantity.");
+                return;
+            }
+
+            // Format form data
+            var formObject = {};
+// Loop through FormData to format date and assign other key-value pairs
+            formData.forEach((value, key) => {
+                // Check if the key is 'requestDate'
+                if (key === 'requestDate') {
+                    // Format date to YYYY-MM-DD
+                    formObject[key] = new Date(value).toISOString().split('T')[0];
+                } else {
+                    // Assign other key-value pairs directly to formObject
+                    formObject[key] = value;
+                }
+            });
+
+
+            console.log(formObject)
+            // Send form data to the server (to the /request endpoint)
+            fetch('/request_form', { // Updated endpoint URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formObject)
+                
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Form submitted successfully");
+                    // Reset form fields if submission is successful
+                    document.getElementById("requesterName").value = "";
+                    document.getElementById("requestDate").value = currentDate;
+                    document.getElementById("quantity").value = "";
+                } else {
+                    console.error("Form submission failed");
+                }
+            })
+            .catch(error => {
+                console.error("Form submission failed:", error);
+            });
+        });
     });
 </script>
-
 
 </body>
 </html>
