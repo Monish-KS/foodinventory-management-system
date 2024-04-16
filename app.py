@@ -1,5 +1,5 @@
 from flask import Flask, render_template,jsonify,request
-from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db
+from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db,load_suppliers_from_db
 
 app = Flask(__name__)
 
@@ -14,6 +14,10 @@ def list_items():
     food_items = load_from_db()
     return jsonify(food_items)
 
+@app.route('/get_suppliers')
+def list_suppliers():
+    suppliers = load_suppliers_from_db()
+    return jsonify(suppliers)
 
 @app.route("/submit_form", methods=["GET", "POST"])
 def submit_form():

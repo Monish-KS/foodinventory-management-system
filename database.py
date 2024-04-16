@@ -63,3 +63,16 @@ def load_requests_from_db():
     except Exception as e:
         print(f"Error from database: {e}")
         return None
+    
+def load_suppliers_from_db():
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(f"select * from supplier"))
+            suppliers = []
+            for row in result.all():
+                suppliers.append(dict(row._mapping))
+            print(suppliers)
+            return suppliers
+    except Exception as e:
+        print(f"Can't reciever supplier data{e}")
+        return None
