@@ -58,6 +58,45 @@ def submit_form():
             print("error")
         return "Form Submitted successfully"
 
+@app.route("/supply", methods=["GET", "POST"])
+def submit_supplier_form():
+    if request.method == "GET":
+        return render_template("supplier.html")
+    elif request.method == "POST":
+        form_data = request.json
+        name = form_data.get("inputName")
+        category = form_data.get("inputCategory")
+        quantity_str = form_data.get("inputQuantity")  # Get quantity as string
+        exp_date = form_data.get("inputExpDate")
+        supplier_id = form_data.get("inputSupplierID")
+
+        # Check if quantity is provided
+        if quantity_str is None or not quantity_str.strip():
+            print("Quantity is required")
+            return "Error: Quantity is required"
+
+        # Convert quantity to integer
+        try:
+            quantity = int(quantity_str)
+        except ValueError:
+            print("Invalid quantity")
+            return "Error: Invalid quantity"
+
+        form_data_send = {
+            "name": name,
+            "category": category,
+            "quantity": quantity,
+            "exp_date": exp_date,
+            "supplier_id": supplier_id,
+        }
+
+        value = insert_into_database(form_data_send)
+        if value:
+            print("successful")
+        else:
+            print("error")
+        return "Form Submitted successfully"
+
 
 @app.route("/<id>")
 def show_fruit(id):
