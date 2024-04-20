@@ -63,7 +63,7 @@ def load_requests_from_db():
     except Exception as e:
         print(f"Error from database: {e}")
         return None
-    
+
 def load_suppliers_from_db():
     try:
         with engine.connect() as conn:
@@ -75,4 +75,24 @@ def load_suppliers_from_db():
             return suppliers
     except Exception as e:
         print(f"Can't reciever supplier data{e}")
+        return None
+
+def load_user_details(email):
+    try:
+        with engine.connect() as conn:
+            print(email)
+            result = conn.execute(text(f"Select * from user WHERE email = '{email}'"))
+            users = []
+            result_all = result.all()
+            column_names = result.keys()
+            for row in result_all:
+                users.append(dict(zip(column_names, row)))
+            print(users)
+            if len(users) == 0:
+                return None
+            else:
+                return users[0]
+            
+    except Exception as e:
+        print(f"Can't reciever user data{e}")
         return None

@@ -1,13 +1,14 @@
-from flask import Flask, render_template,jsonify,request
-from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db,load_suppliers_from_db
+from flask import Flask, render_template,jsonify,request,redirect, url_for
+from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db,load_suppliers_from_db, load_user_details
 
 app = Flask(__name__)
 
-@app.route("/")
-def hello_world():
+@app.route("/admin")
+def admin():
     food_items = load_from_db()
+    username = request.args.get('username')
     requests = load_requests_from_db()
-    return render_template("home.html",food_items=food_items,requests = requests)
+    return render_template("admin_dashboard.html",food_items=food_items,requests = requests,username = username)
 
 @app.route('/inventory')
 def list_items():
@@ -61,7 +62,8 @@ def submit_form():
 @app.route("/supply", methods=["GET", "POST"])
 def submit_supplier_form():
     if request.method == "GET":
-        return render_template("supplier.html")
+        username = request.args.get('username')
+        return render_template("supplier_dashboard.html",username = username)
     elif request.method == "POST":
         form_data = request.json
         name = form_data.get("inputName")
@@ -109,7 +111,7 @@ def show_fruit(id):
 @app.route('/request_page')
 def show_request():
     requests = load_requests_from_db()
-    return render_template("Reciever.html", requests=requests)
+    return render_template("Reciever_dashboard.html", requests=requests)
 
 
 @app.route("/request_form", methods=["GET", "POST"])
@@ -117,7 +119,8 @@ def request_form():
     if request.method == "GET":
         # Load data needed for the form, such as inventory items
         food_items = load_from_db()
-        return render_template("request.html", food_items=food_items)
+        username = request.args.get('username')
+        return render_template("request.html", food_items=food_items, username = username)
     elif request.method == "POST":
         # Get form data
         form_data = request.json
@@ -158,6 +161,41 @@ def request_form():
         else:
             return "Error submitting request"
 
+@app.route('/login', methods = ['GET','POST'])
+def user_login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    elif request.method == 'POST':
+        # Retrieve form data from the JSON request body
+        form_data = request.json
+        email = form_data.get("email")
+        password = form_data.get("password")
+        print(email, password)
+        # Load user details from the database using the email
+        user_details = load_user_details(email)
+        username = user_details['username']
+        print(user_details)
+        if user_details is not None:
+            # Check if the provided password matches the password from the database
+            if password == user_details["Password"]:
+                # Determine the user type and render the appropriate template
+                user_type = user_details["UserType"]
+
+            if user_type == 'admin':
+                redirect_url = url_for('admin', username=username)
+            elif user_type == 'supplier':
+                redirect_url = url_for('submit_supplier_form', username=username)
+            elif user_type == 'receiver':
+                redirect_url = url_for('request_page', username=username)
+            if redirect_url:
+                return jsonify({"success": True, "redirectUrl": redirect_url, "username" : user_details['username']})
+            else:
+                # Unknown user type, return an error response
+                return jsonify({"error": "Unknown user type"}), 400
+
+        else:
+            # User not found, return an error response
+            return jsonify({"error": "User not found"}), 404
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',debug=True)
