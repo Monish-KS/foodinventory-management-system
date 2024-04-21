@@ -92,7 +92,32 @@ def load_user_details(email):
                 return None
             else:
                 return users[0]
-            
+
     except Exception as e:
         print(f"Can't reciever user data{e}")
         return None
+
+
+def update_request_status_in_db(request_id, new_status):
+    try:
+        # Connect to the database
+        with engine.connect() as conn:
+            # Define the SQL query to update the request status
+            query = text(
+                f"UPDATE requests SET status = '{new_status}' WHERE request_id = '{request_id}'"
+            )
+
+            # Execute the query
+            conn.execute(query)
+
+            # Commit the transaction to save changes to the database
+            conn.commit()
+
+        # Return True if the update is successful
+        return True
+    except Exception as e:
+        # Print an error message if an exception occurs
+        print(f"Error updating request status: {e}")
+
+        # Return False if there is an error during the update
+        return False

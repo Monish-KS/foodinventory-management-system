@@ -6,12 +6,14 @@
 						      <td>{{request['item_name']}}</td>
                               <td>{{request['quantity']}}</td>
 						      <td>
-                                        {% if request['status'] == 'Accepted' %}
-                                            <a href="#" class="btn btn-success">Accepted</a>
-                                        {% elif request['status'] == 'Rejected' %}
-                                            <a href="#" class="btn btn-danger">Rejected</a>
-                                        {% else %}
-                                            <a href="#" class="btn btn-warning">Pending</a>
-                                        {% endif %}
+                                            {% if request['status'] == 'pending' %}
+                                                <button class="btn btn-success accept-button" data-request-id="{{ request['request_id']}}">Accept</button>
+                                                <button class="btn btn-danger reject-button" data-request-id="{{request['request_id'] }}">Reject</button>
+                                            {% elif request['status'] == 'Accepted' %}
+                                                <a href="#" class="btn btn-success">Accepted</a>
+                                            {% else%}
+                                                <a href="#" class="btn btn-danger">Rejected</a>
+                                            {% endif %}
                               </td>
 </tr>
+

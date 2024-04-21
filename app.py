@@ -1,7 +1,13 @@
 from flask import Flask, render_template,jsonify,request,redirect, url_for
-from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db,load_suppliers_from_db, load_user_details
+from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db,load_suppliers_from_db, load_user_details,update_request_status_in_db
 
 app = Flask(__name__)
+
+
+@app.route('/')
+def root():
+    return redirect(url_for("user_login"))
+
 
 @app.route("/admin")
 def admin():
@@ -142,7 +148,6 @@ def request_form():
             print("Invalid quantity")
             return "Error: Invalid quantity"
 
-
         # Prepare data to insert into the request database
         request_data = {
             "requester_name": requester_name,
@@ -160,6 +165,30 @@ def request_form():
             return "Request submitted successfully"
         else:
             return "Error submitting request"
+
+
+@app.route("/update_request_status", methods=["POST"])
+def update_request_status():
+    # Retrieve data from the AJAX request
+    form_data = request.json
+    request_id = form_data.get("request_id")
+    action = form_data.get("action")  # 'accept' or 'reject'
+
+    # Update request status in the database
+    if action == "accept":
+        new_status = "Accepted"
+    elif action == "reject":
+        new_status = "Rejected"
+    else:
+        return jsonify({"error": "Invalid action"}), 400
+
+    success = update_request_status_in_db(request_id, new_status)
+
+    if success:
+        return jsonify({"success": True})
+    else:
+        return jsonify({"error": "Failed to update request status"}), 500
+
 
 @app.route('/login', methods = ['GET','POST'])
 def user_login():
