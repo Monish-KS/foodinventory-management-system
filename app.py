@@ -1,5 +1,10 @@
-from flask import Flask, render_template,jsonify,request,redirect, url_for
+from flask import Flask, render_template,jsonify,request,redirect, url_for, send_file
 from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db,load_suppliers_from_db, load_user_details,update_request_status_in_db
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle
+from datetime import datetime,date
 
 app = Flask(__name__)
 
@@ -188,6 +193,143 @@ def update_request_status():
         return jsonify({"success": True})
     else:
         return jsonify({"error": "Failed to update request status"}), 500
+
+
+@app.route("/generate_report")
+def generate_report():
+    # Retrieve data from the database
+    food_items = load_from_db()
+
+    # Create a new PDF file
+    pdf_filename = "report.pdf"
+    c = canvas.Canvas(pdf_filename, pagesize=letter)
+
+    # Set title and add a line
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(30, 750, "FoodBank Inventory Report")
+    c.line(30, 745, 580, 745)  # Draw a line under the title
+
+    # Set table headers
+    headers = ["Item ID", "Name", "Category", "Quantity", "Exp Date", "Supplier ID"]
+    data = [headers]
+
+    # Populate the table data
+    for item in food_items:
+        # Convert `ExpDate` to a string if it is a `datetime.date` object
+        exp_date_str = (
+            item["ExpDate"].strftime("%Y-%m-%d")
+            if hasattr(item["ExpDate"], "strftime")
+            else str(item["ExpDate"])
+        )
+
+        row = [
+            item["ItemID"],
+            item["Name"],
+            item["Category"],
+            item["Quantity"],
+            exp_date_str,
+            item["SupplierID"],
+        ]
+        data.append(row)
+
+    # Create the table and apply styles
+    table = Table(data, colWidths=[80] * len(headers))
+    style = TableStyle(
+        [
+            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),  # Header background color
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Header text color
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),  # Center align all columns
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),  # Bold header font
+            ("FONTSIZE", (0, 0), (-1, -1), 10),  # Font size
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 12),  # Padding for headers
+            ("BACKGROUND", (0, 1), (-1, -1), colors.beige),  # Background color for rows
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),  # Add a grid to the table
+        ]
+    )
+    table.setStyle(style)
+
+    # Draw the table on the PDF
+    table.wrapOn(c, 580, 680)
+    table.drawOn(c, 30, 550)  # Adjust position of the table
+
+    # Save the PDF file
+    c.save()
+
+    # Return the PDF file as a file download
+    return send_file(pdf_filename, as_attachment=True)
+
+
+@app.route("/generate_requests_report")
+def generate_requests_report():
+    # Retrieve requests data from the database
+    requests = load_requests_from_db()
+
+    # Create a new PDF file
+    pdf_filename = "requests_report.pdf"
+    c = canvas.Canvas(pdf_filename, pagesize=letter)
+
+    # Set title and add a line
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(30, 750, "Requests Report")
+    c.line(30, 745, 580, 745)  # Draw a line under the title
+
+    # Set table headers
+    headers = [
+        "Request ID",
+        "Requester Name",
+        "Request Date",
+        "Item ID",
+        "Item Name",
+        "Quantity",
+        "Status",
+    ]
+    data = [headers]
+
+    # Populate the table data
+    for request in requests:
+        # Convert `request_date` to a string if it is a `datetime.date` object
+        request_date_str = (
+            request["request_date"].strftime("%Y-%m-%d")
+            if hasattr(request["request_date"], "strftime")
+            else str(request["request_date"])
+        )
+
+        row = [
+            request["request_id"],
+            request["requester_name"],
+            request_date_str,
+            request["item_id"],
+            request["item_name"],
+            request["quantity"],
+            request["status"],
+        ]
+        data.append(row)
+
+    # Create the table and apply styles
+    table = Table(data, colWidths=[70] * len(headers))
+    style = TableStyle(
+        [
+            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),  # Header background color
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Header text color
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),  # Center align all columns
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),  # Bold header font
+            ("FONTSIZE", (0, 0), (-1, -1), 10),  # Font size
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 12),  # Padding for headers
+            ("BACKGROUND", (0, 1), (-1, -1), colors.beige),  # Background color for rows
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),  # Add a grid to the table
+        ]
+    )
+    table.setStyle(style)
+
+    # Draw the table on the PDF
+    table.wrapOn(c, 580, 680)
+    table.drawOn(c, 30, 550)  # Adjust position of the table
+
+    # Save the PDF file
+    c.save()
+
+    # Return the PDF file as a file download
+    return send_file(pdf_filename, as_attachment=True)
 
 
 @app.route('/login', methods = ['GET','POST'])
