@@ -1,9 +1,13 @@
 from flask import Flask, render_template,jsonify,request,redirect, url_for, send_file
 from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db,load_suppliers_from_db, load_user_details,update_request_status_in_db
 from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from reportlab.platypus import Table, TableStyle, Image
 from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from io import BytesIO
 from datetime import datetime,date
 
 app = Flask(__name__)
@@ -265,6 +269,16 @@ def generate_requests_report():
     # Retrieve requests data from the database
     requests = load_requests_from_db()
 
+    # Create a dictionary to sum quantities for each item
+    item_quantities = {}
+    for request in requests:
+        item_name = request["item_name"]
+        quantity = request["quantity"]
+        if item_name in item_quantities:
+            item_quantities[item_name] += quantity
+        else:
+            item_quantities[item_name] = quantity
+
     # Create a new PDF file
     pdf_filename = "requests_report.pdf"
     c = canvas.Canvas(pdf_filename, pagesize=letter)
@@ -288,13 +302,11 @@ def generate_requests_report():
 
     # Populate the table data
     for request in requests:
-        # Convert `request_date` to a string if it is a `datetime.date` object
         request_date_str = (
             request["request_date"].strftime("%Y-%m-%d")
             if hasattr(request["request_date"], "strftime")
             else str(request["request_date"])
         )
-
         row = [
             request["request_id"],
             request["requester_name"],
@@ -325,6 +337,27 @@ def generate_requests_report():
     # Draw the table on the PDF
     table.wrapOn(c, 580, 680)
     table.drawOn(c, 30, 550)  # Adjust position of the table
+
+    # Create a pie chart for item quantities using Matplotlib
+    # Use the item_quantities dictionary to plot the pie chart
+    item_names = list(item_quantities.keys())
+    quantities = list(item_quantities.values())
+
+    # Create a figure for the pie chart
+    fig, ax = plt.subplots(figsize=(4, 4))  # Smaller figure size
+
+    # Plotting the pie chart
+    ax.pie(quantities, labels=item_names, autopct="%1.1f%%")
+    ax.set_title("Item Quantities")
+
+    # Save the pie chart as an image
+    pie_img_filename = "item_pie_chart.png"
+    plt.savefig(pie_img_filename)
+
+    # Add the pie chart image to the PDF below the table
+    c.drawImage(
+        pie_img_filename, 30, 200, width=300, height=300
+    )  # Adjust the width and height as needed
 
     # Save the PDF file
     c.save()
