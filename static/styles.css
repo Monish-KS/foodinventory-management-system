@@ -8,7 +8,7 @@ background: linear-gradient(to right, #CFDEF3, #E0EAFC); /* W3C, IE 10+/ Edge, F
 
 
 .Name{
-    color: black;
+    color: rgb(255, 255, 255);
     font-family: 'Lato', sans-serif;
     font-size: 54px;
     font-weight: 300;
@@ -18,10 +18,11 @@ background: linear-gradient(to right, #CFDEF3, #E0EAFC); /* W3C, IE 10+/ Edge, F
     margin-bottom:10px ;
     text-align: right;
     padding-top: 120px;
+    padding-right: 20px;
     
 }
 .Name-2{
-    color: black;
+    color: rgb(255, 255, 255);
     font-family: 'Lucida Sans',Arial, sans-serif;
     font-size: 35px;
     line-height: 26px;
@@ -29,12 +30,12 @@ background: linear-gradient(to right, #CFDEF3, #E0EAFC); /* W3C, IE 10+/ Edge, F
     margin-top: 30px;
     text-align: right;
     margin-left: 30px;
-
+    padding-right: 20px;
 
 }
 
 .main-title{
-    background-image: url('../static/images/background-image-3.avif.png');
+    background-image: url('../static/images/top-view-delicious-pasta-table.jpg');
     background-size: cover; /* Cover the entire container */
     background-position: center; /* Center the background image */
     height: 50vh; /* Full height of the viewport */

@@ -122,7 +122,8 @@ def show_fruit(id):
 @app.route('/request_page')
 def show_request():
     requests = load_requests_from_db()
-    return render_template("Reciever_dashboard.html", requests=requests)
+    username = request.args.get('username')
+    return render_template("reciever_dashboard.html", requests=requests,username = username)
 
 
 @app.route("/request_form", methods=["GET", "POST"])
