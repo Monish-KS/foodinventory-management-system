@@ -132,14 +132,13 @@
 	  gtag('config', 'UA-23581568-13');
 	</script>
 <script>document.addEventListener('DOMContentLoaded', function() {
-    // Add event listener for accept and reject buttons
+    
     document.querySelectorAll('.accept-button, .reject-button').forEach(button => {
         button.addEventListener('click', function() {
-            // Get the request ID and action from the button
+         
             const requestId = button.getAttribute('data-request-id');
             const action = button.classList.contains('accept-button') ? 'accept' : 'reject';
 
-            // Send AJAX request to update request status
             fetch('/update_request_status', {
                 method: 'POST',
                 headers: {
@@ -150,10 +149,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update successful, reload the page or update the request status in the table
-                    location.reload(); // Reload the page
+                   
+                    location.reload();
                 } else {
-                    // Handle error case
+               
                     alert('Failed to update request status');
                 }
             })

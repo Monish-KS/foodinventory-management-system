@@ -51,7 +51,7 @@
     <label for="inputSupplierID" class="col-sm-2 col-form-label p-3">SupplierID</label>
     <div class="col-sm-10 p-3">
       <select class="form-control" name="inputSupplierID" id="inputSupplierID">
-        <option value="">Select Supplier</option> <!-- Empty option -->
+        <option value="">Select Supplier</option> 
       </select>
 
     </div>
@@ -65,16 +65,15 @@
 </div>
 <script>
   document.getElementById("myForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault(); 
     
-    // Get form data
+ 
     var formData = new FormData(this);
 
-    // Convert form data to JSON
+  
     var jsonData = {};
     formData.forEach(function(value, key) {
-      if (key === 'inputExpDate') {
-        // Format the date to YYYY-MM-DD
+      if (key === 'inputExpDate') { 
         var formattedDate = new Date(value).toISOString().slice(0, 10);
         jsonData[key] = formattedDate;
       } else {
@@ -82,7 +81,7 @@
       }
     });
 
-    // Send JSON data to Flask route
+  
     fetch('/submit_form', {
       method: 'POST',
       headers: {
@@ -97,23 +96,23 @@
       return response.text();
     })
     .then(data => {
-      console.log(data); // Handle response from Flask route
+      console.log(data); 
     })
     .catch(error => {
       console.error('There was a problem with the fetch operation:', error);
     });
   });
 
-  // Fetch supplier data from Flask route
+ 
 fetch('/get_suppliers')
   .then(response => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    return response.json(); // Parse response as JSON
+    return response.json(); 
   })
   .then(data => {
-    // Iterate over the supplier data and create options for the dropdown
+    
     var selectElement = document.getElementById("inputSupplierID");
     data.forEach(function(supplier) {
       var option = document.createElement("option");

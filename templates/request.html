@@ -21,7 +21,7 @@
             <div class="mb-3">
                 <label for="itemID" class="form-label">Item ID</label>
                 <select class="form-select" id="itemID" name="itemID">
-                    <!-- Options will be dynamically populated using JavaScript -->
+                   
                 </select>
             </div>
             <div class="mb-3">
@@ -38,7 +38,7 @@
     <div class="container mt-6">
     <div class="row justify-content-center">
         <div class="col-md-6 text-center">
-            <!-- Button to redirect to '/request_form' route -->
+          
             <a href="/request_page" class="btn btn-primary">Go Back</a>
         </div>
     </div>
@@ -46,11 +46,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Set the current date in the requestDate input field
+        
         const currentDate = new Date().toISOString().split('T')[0];
         document.getElementById("requestDate").value = currentDate;
 
-        // Fetch items from the inventory table and populate the item ID dropdown
+
         fetch('/inventory')
         .then(response => response.json())
         .then(data => {
@@ -59,56 +59,55 @@
                 const option = document.createElement("option");
                 option.value = item.ItemID;
                 option.text = item.ItemID;
-                option.dataset.itemName = item.Name; // Set the item name as a custom data attribute
+                option.dataset.itemName = item.Name; 
                 itemIDDropdown.appendChild(option);
             });
         });
 
-        // Automatically set the item name based on the selected item ID
+        
         document.getElementById("itemID").addEventListener("change", function() {
             const selectedItemID = this.value;
             const selectedItem = document.querySelector(`#itemID option[value="${selectedItemID}"]`);
             document.getElementById("itemName").value = selectedItem ? selectedItem.dataset.itemName : '';
         });
 
-        // Form submit event listener
+        
         document.getElementById("requestForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent the default form submission
-
-            // Validate the quantity field
+            event.preventDefault(); 
+            
             const quantity = document.getElementById("quantity").value;
             if (quantity === "") {
                 alert("Please enter a quantity.");
                 return;
             }
 
-            // Get form data
+           
             var formData = new FormData(this);
 
-            // Check if quantity is included in the form data
+            
             if (!formData.has("quantity")) {
                 alert("Please enter a quantity.");
                 return;
             }
 
-            // Format form data
+            
             var formObject = {};
-// Loop through FormData to format date and assign other key-value pairs
+
             formData.forEach((value, key) => {
-                // Check if the key is 'requestDate'
+                
                 if (key === 'requestDate') {
-                    // Format date to YYYY-MM-DD
+                 
                     formObject[key] = new Date(value).toISOString().split('T')[0];
                 } else {
-                    // Assign other key-value pairs directly to formObject
+                    
                     formObject[key] = value;
                 }
             });
 
 
             console.log(formObject)
-            // Send form data to the server (to the /request endpoint)
-            fetch('/request_form', { // Updated endpoint URL
+           
+            fetch('/request_form', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -119,7 +118,7 @@
             .then(response => {
                 if (response.ok) {
                     console.log("Form submitted successfully");
-                    // Reset form fields if submission is successful
+                    
                     document.getElementById("requesterName").value = "";
                     document.getElementById("requestDate").value = currentDate;
                     document.getElementById("quantity").value = "";

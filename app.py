@@ -43,16 +43,16 @@ def submit_form():
         form_data = request.json
         name = form_data.get("inputName")
         category = form_data.get("inputCategory")
-        quantity_str = form_data.get("inputQuantity")  # Get quantity as string
+        quantity_str = form_data.get("inputQuantity")
         exp_date = form_data.get("inputExpDate")
         supplier_id = form_data.get("inputSupplierID")
 
-        # Check if quantity is provided
+        
         if quantity_str is None or not quantity_str.strip():
             print("Quantity is required")
             return "Error: Quantity is required"
 
-        # Convert quantity to integer
+        
         try:
             quantity = int(quantity_str)
         except ValueError:
@@ -83,16 +83,16 @@ def submit_supplier_form():
         form_data = request.json
         name = form_data.get("inputName")
         category = form_data.get("inputCategory")
-        quantity_str = form_data.get("inputQuantity")  # Get quantity as string
+        quantity_str = form_data.get("inputQuantity") 
         exp_date = form_data.get("inputExpDate")
         supplier_id = form_data.get("inputSupplierID")
 
-        # Check if quantity is provided
+        
         if quantity_str is None or not quantity_str.strip():
             print("Quantity is required")
             return "Error: Quantity is required"
 
-        # Convert quantity to integer
+        
         try:
             quantity = int(quantity_str)
         except ValueError:
@@ -123,22 +123,23 @@ def show_fruit(id):
     else:
         return jsonify(fruit)
 
-@app.route('/request_page')
+@app.route('/request_page',methods = ['GET'])
 def show_request():
-    requests = load_requests_from_db()
-    username = request.args.get('username')
-    return render_template("reciever_dashboard.html", requests=requests,username = username)
+    if request.method == "GET":
+        requests = load_requests_from_db()
+        username = request.args.get('username')
+        return render_template("reciever_dashboard.html", requests=requests,username = username)
 
 
 @app.route("/request_form", methods=["GET", "POST"])
 def request_form():
     if request.method == "GET":
-        # Load data needed for the form, such as inventory items
+       
         food_items = load_from_db()
         username = request.args.get('username')
         return render_template("request.html", food_items=food_items, username = username)
     elif request.method == "POST":
-        # Get form data
+       
         form_data = request.json
         print(form_data)
         requester_name = form_data.get("requesterName")
@@ -151,24 +152,24 @@ def request_form():
             print("Quantity is required")
             return "Error: Quantity is required"
 
-        # Convert quantity to integer
+        
         try:
             quantity = int(quantity_str)
         except ValueError:
             print("Invalid quantity")
             return "Error: Invalid quantity"
 
-        # Prepare data to insert into the request database
+        
         request_data = {
             "requester_name": requester_name,
             "request_date": request_date,
             "item_id": item_id,
             "item_name": item_name,
             "quantity": quantity,
-            "status": "pending",  # Set status to "pending"
+            "status": "pending",  
         }
 
-        # Insert data into the request database
+        
         success = insert_request_into_database(request_data)
 
         if success:
@@ -179,12 +180,12 @@ def request_form():
 
 @app.route("/update_request_status", methods=["POST"])
 def update_request_status():
-    # Retrieve data from the AJAX request
+    
     form_data = request.json
     request_id = form_data.get("request_id")
-    action = form_data.get("action")  # 'accept' or 'reject'
+    action = form_data.get("action")  
 
-    # Update request status in the database
+ 
     if action == "accept":
         new_status = "Accepted"
     elif action == "reject":
@@ -202,25 +203,23 @@ def update_request_status():
 
 @app.route("/generate_report")
 def generate_report():
-    # Retrieve data from the database
+
     food_items = load_from_db()
 
-    # Create a new PDF file
     pdf_filename = "report.pdf"
     c = canvas.Canvas(pdf_filename, pagesize=letter)
 
-    # Set title and add a line
+    
     c.setFont("Helvetica-Bold", 14)
     c.drawString(30, 750, "FoodBank Inventory Report")
-    c.line(30, 745, 580, 745)  # Draw a line under the title
+    c.line(30, 745, 580, 745)  
 
-    # Set table headers
+  
     headers = ["Item ID", "Name", "Category", "Quantity", "Exp Date", "Supplier ID"]
     data = [headers]
 
-    # Populate the table data
     for item in food_items:
-        # Convert `ExpDate` to a string if it is a `datetime.date` object
+       
         exp_date_str = (
             item["ExpDate"].strftime("%Y-%m-%d")
             if hasattr(item["ExpDate"], "strftime")
@@ -237,39 +236,39 @@ def generate_report():
         ]
         data.append(row)
 
-    # Create the table and apply styles
+ 
     table = Table(data, colWidths=[80] * len(headers))
     style = TableStyle(
         [
-            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),  # Header background color
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Header text color
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),  # Center align all columns
-            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),  # Bold header font
-            ("FONTSIZE", (0, 0), (-1, -1), 10),  # Font size
-            ("BOTTOMPADDING", (0, 0), (-1, 0), 12),  # Padding for headers
-            ("BACKGROUND", (0, 1), (-1, -1), colors.beige),  # Background color for rows
-            ("GRID", (0, 0), (-1, -1), 1, colors.black),  # Add a grid to the table
+            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),  
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),  
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),  
+            ("FONTSIZE", (0, 0), (-1, -1), 10),  
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 12), 
+            ("BACKGROUND", (0, 1), (-1, -1), colors.beige),  
+            ("GRID", (0, 0), (-1, -1), 1, colors.black), 
         ]
     )
     table.setStyle(style)
 
-    # Draw the table on the PDF
+   
     table.wrapOn(c, 580, 680)
-    table.drawOn(c, 30, 550)  # Adjust position of the table
+    table.drawOn(c, 30, 550)  
 
-    # Save the PDF file
+    
     c.save()
 
-    # Return the PDF file as a file download
+    
     return send_file(pdf_filename, as_attachment=True)
 
 
 @app.route("/generate_requests_report")
 def generate_requests_report():
-    # Retrieve requests data from the database
+    
     requests = load_requests_from_db()
 
-    # Create a dictionary to sum quantities for each item
+    
     item_quantities = {}
     for request in requests:
         item_name = request["item_name"]
@@ -279,16 +278,16 @@ def generate_requests_report():
         else:
             item_quantities[item_name] = quantity
 
-    # Create a new PDF file
+    
     pdf_filename = "requests_report.pdf"
     c = canvas.Canvas(pdf_filename, pagesize=letter)
 
-    # Set title and add a line
+    
     c.setFont("Helvetica-Bold", 14)
     c.drawString(30, 750, "Requests Report")
-    c.line(30, 745, 580, 745)  # Draw a line under the title
+    c.line(30, 745, 580, 745)
 
-    # Set table headers
+    
     headers = [
         "Request ID",
         "Requester Name",
@@ -300,7 +299,7 @@ def generate_requests_report():
     ]
     data = [headers]
 
-    # Populate the table data
+   
     for request in requests:
         request_date_str = (
             request["request_date"].strftime("%Y-%m-%d")
@@ -318,51 +317,48 @@ def generate_requests_report():
         ]
         data.append(row)
 
-    # Create the table and apply styles
+
     table = Table(data, colWidths=[70] * len(headers))
     style = TableStyle(
         [
-            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),  # Header background color
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),  # Header text color
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),  # Center align all columns
-            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),  # Bold header font
-            ("FONTSIZE", (0, 0), (-1, -1), 10),  # Font size
-            ("BOTTOMPADDING", (0, 0), (-1, 0), 12),  # Padding for headers
-            ("BACKGROUND", (0, 1), (-1, -1), colors.beige),  # Background color for rows
-            ("GRID", (0, 0), (-1, -1), 1, colors.black),  # Add a grid to the table
+            ("BACKGROUND", (0, 0), (-1, 0), colors.grey),  
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke), 
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),  
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"), 
+            ("FONTSIZE", (0, 0), (-1, -1), 10), 
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 12),  
+            ("BACKGROUND", (0, 1), (-1, -1), colors.beige), 
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),  
         ]
     )
     table.setStyle(style)
 
-    # Draw the table on the PDF
+  
     table.wrapOn(c, 580, 680)
-    table.drawOn(c, 30, 550)  # Adjust position of the table
+    table.drawOn(c, 30, 550)  
 
-    # Create a pie chart for item quantities using Matplotlib
-    # Use the item_quantities dictionary to plot the pie chart
+   
     item_names = list(item_quantities.keys())
     quantities = list(item_quantities.values())
 
-    # Create a figure for the pie chart
-    fig, ax = plt.subplots(figsize=(4, 4))  # Smaller figure size
+    
+    fig, ax = plt.subplots(figsize=(4, 4)) 
 
-    # Plotting the pie chart
     ax.pie(quantities, labels=item_names, autopct="%1.1f%%")
     ax.set_title("Item Quantities")
 
-    # Save the pie chart as an image
+   
     pie_img_filename = "item_pie_chart.png"
     plt.savefig(pie_img_filename)
 
-    # Add the pie chart image to the PDF below the table
+ 
     c.drawImage(
         pie_img_filename, 30, 200, width=300, height=300
-    )  # Adjust the width and height as needed
+    )  
 
-    # Save the PDF file
+  
     c.save()
 
-    # Return the PDF file as a file download
     return send_file(pdf_filename, as_attachment=True)
 
 
@@ -371,19 +367,19 @@ def user_login():
     if request.method == 'GET':
         return render_template('login.html')
     elif request.method == 'POST':
-        # Retrieve form data from the JSON request body
+        
         form_data = request.json
         email = form_data.get("email")
         password = form_data.get("password")
         print(email, password)
-        # Load user details from the database using the email
+       
         user_details = load_user_details(email)
         username = user_details['username']
         print(user_details)
         if user_details is not None:
-            # Check if the provided password matches the password from the database
+            
             if password == user_details["Password"]:
-                # Determine the user type and render the appropriate template
+               
                 user_type = user_details["UserType"]
 
             if user_type == 'admin':
@@ -391,15 +387,15 @@ def user_login():
             elif user_type == 'supplier':
                 redirect_url = url_for('submit_supplier_form', username=username)
             elif user_type == 'receiver':
-                redirect_url = url_for('request_page', username=username)
+                redirect_url = url_for("show_request", username=username)
             if redirect_url:
                 return jsonify({"success": True, "redirectUrl": redirect_url, "username" : user_details['username']})
             else:
-                # Unknown user type, return an error response
+                
                 return jsonify({"error": "Unknown user type"}), 400
 
         else:
-            # User not found, return an error response
+            
             return jsonify({"error": "User not found"}), 404
 
 if __name__ == "__main__":

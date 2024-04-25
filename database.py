@@ -31,11 +31,11 @@ def insert_into_database(data):
                     f"INSERT INTO inventory (Name, Category, Quantity, ExpDate, SupplierID) VALUES ('{data['name']}', '{data['category']}', {data['quantity']}, '{data['exp_date']}', '{data['supplier_id']}')"
                 )
             conn.execute(query)
-            conn.commit()  # Commit changes to the database
-        return True  # Return True if insertion is successful
+            conn.commit() 
+        return True 
     except Exception as e:
         print(f"Error inserting data into database: {e}")
-        return False  # Return False if an error occurs during insertion
+        return False  
 
 
 def insert_request_into_database(data):
@@ -100,24 +100,23 @@ def load_user_details(email):
 
 def update_request_status_in_db(request_id, new_status):
     try:
-        # Connect to the database
+       
         with engine.connect() as conn:
-            # Define the SQL query to update the request status
+
             query = text(
                 f"UPDATE requests SET status = '{new_status}' WHERE request_id = '{request_id}'"
             )
 
-            # Execute the query
+ 
             conn.execute(query)
 
-            # Commit the transaction to save changes to the database
+      
             conn.commit()
 
-        # Return True if the update is successful
         return True
     except Exception as e:
-        # Print an error message if an exception occurs
+
         print(f"Error updating request status: {e}")
 
-        # Return False if there is an error during the update
+    
         return False
