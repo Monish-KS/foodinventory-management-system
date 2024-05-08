@@ -100,23 +100,13 @@ def load_user_details(email):
 
 def update_request_status_in_db(request_id, new_status):
     try:
-       
         with engine.connect() as conn:
-
             query = text(
                 f"UPDATE requests SET status = '{new_status}' WHERE request_id = '{request_id}'"
             )
-
- 
-            conn.execute(query)
-
-      
+            conn.execute(query)    
             conn.commit()
-
         return True
     except Exception as e:
-
         print(f"Error updating request status: {e}")
-
-    
         return False

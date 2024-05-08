@@ -1,0 +1,18 @@
+ <tr>
+						      <th scope="row">{{request['request_id']}}</th>
+						      <td>{{request['requester_name']}}</td>
+						      <td>{{request['request_date']}}</td>
+						      <td>{{request['item_id']}}</td>
+						      <td>{{request['item_name']}}</td>
+                              <td>{{request['quantity']}}</td>
+						      <td>
+                                            {% if request['status'] == 'pending' %}
+                                                <a href="'#" class="btn btn-warning"> Pending </a>
+                                            {% elif request['status'] == 'Accepted' %}
+                                                <a href="#" class="btn btn-success">Accepted</a>
+                                            {% else%}
+                                                <a href="#" class="btn btn-danger">Rejected</a>
+                                            {% endif %}
+                              </td>
+</tr>
+

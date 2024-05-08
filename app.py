@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from io import BytesIO
 from datetime import datetime,date
+from db_manager import DatabaseManager
 
 app = Flask(__name__)
 
@@ -40,6 +41,7 @@ def submit_form():
     if request.method == "GET":
         return render_template("add-inventory.html")
     elif request.method == "POST":
+        db_manager.begin_transaction()
         form_data = request.json
         name = form_data.get("inputName")
         category = form_data.get("inputCategory")
@@ -47,12 +49,10 @@ def submit_form():
         exp_date = form_data.get("inputExpDate")
         supplier_id = form_data.get("inputSupplierID")
 
-        
         if quantity_str is None or not quantity_str.strip():
             print("Quantity is required")
             return "Error: Quantity is required"
 
-        
         try:
             quantity = int(quantity_str)
         except ValueError:
@@ -71,6 +71,7 @@ def submit_form():
         if value:
             print("successful")
         else:
+            db_manager.rollback_transaction()
             print("error")
         return "Form Submitted successfully"
 
@@ -87,12 +88,10 @@ def submit_supplier_form():
         exp_date = form_data.get("inputExpDate")
         supplier_id = form_data.get("inputSupplierID")
 
-        
         if quantity_str is None or not quantity_str.strip():
             print("Quantity is required")
             return "Error: Quantity is required"
 
-        
         try:
             quantity = int(quantity_str)
         except ValueError:
@@ -111,6 +110,7 @@ def submit_supplier_form():
         if value:
             print("successful")
         else:
+            db_manager.rollback_transaction()
             print("error")
         return "Form Submitted successfully"
 
@@ -134,12 +134,12 @@ def show_request():
 @app.route("/request_form", methods=["GET", "POST"])
 def request_form():
     if request.method == "GET":
-       
+
         food_items = load_from_db()
         username = request.args.get('username')
         return render_template("request.html", food_items=food_items, username = username)
     elif request.method == "POST":
-       
+
         form_data = request.json
         print(form_data)
         requester_name = form_data.get("requesterName")
@@ -152,14 +152,12 @@ def request_form():
             print("Quantity is required")
             return "Error: Quantity is required"
 
-        
         try:
             quantity = int(quantity_str)
         except ValueError:
             print("Invalid quantity")
             return "Error: Invalid quantity"
 
-        
         request_data = {
             "requester_name": requester_name,
             "request_date": request_date,
@@ -168,13 +166,12 @@ def request_form():
             "quantity": quantity,
             "status": "pending",  
         }
-
-        
         success = insert_request_into_database(request_data)
 
         if success:
             return "Request submitted successfully"
         else:
+            db_manager.rollback_transaction()
             return "Error submitting request"
 
 
@@ -185,7 +182,6 @@ def update_request_status():
     request_id = form_data.get("request_id")
     action = form_data.get("action")  
 
- 
     if action == "accept":
         new_status = "Accepted"
     elif action == "reject":
@@ -208,8 +204,7 @@ def generate_report():
 
     pdf_filename = "report.pdf"
     c = canvas.Canvas(pdf_filename, pagesize=letter)
-
-    
+   
     c.setFont("Helvetica-Bold", 14)
     c.drawString(30, 750, "FoodBank Inventory Report")
     c.line(30, 745, 580, 745)  
