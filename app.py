@@ -1,5 +1,5 @@
 from flask import Flask, render_template,jsonify,request,redirect, url_for, send_file
-from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db,load_suppliers_from_db, load_user_details,update_request_status_in_db
+from database import load_from_db, load_fruit_from_db,insert_into_database,insert_request_into_database,load_requests_from_db,load_suppliers_from_db, load_user_details,update_request_status_in_db,delete_inventory_item_from_db
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Table, TableStyle, Image
 from reportlab.lib import colors
@@ -41,7 +41,7 @@ def submit_form():
     if request.method == "GET":
         return render_template("add-inventory.html")
     elif request.method == "POST":
-        db_manager.begin_transaction()
+        #db_manager.begin_transaction()
         form_data = request.json
         name = form_data.get("inputName")
         category = form_data.get("inputCategory")
@@ -362,19 +362,19 @@ def user_login():
     if request.method == 'GET':
         return render_template('login.html')
     elif request.method == 'POST':
-        
+
         form_data = request.json
         email = form_data.get("email")
         password = form_data.get("password")
         print(email, password)
-       
+
         user_details = load_user_details(email)
         username = user_details['username']
         print(user_details)
         if user_details is not None:
-            
+
             if password == user_details["Password"]:
-               
+
                 user_type = user_details["UserType"]
 
             if user_type == 'admin':
@@ -386,12 +386,35 @@ def user_login():
             if redirect_url:
                 return jsonify({"success": True, "redirectUrl": redirect_url, "username" : user_details['username']})
             else:
-                
+
                 return jsonify({"error": "Unknown user type"}), 400
 
         else:
-            
+
             return jsonify({"error": "User not found"}), 404
+
+
+@app.route("/delete_inventory_item", methods=["POST"])
+def delete_inventory_item():
+    form_data = request.json
+    item_id = form_data.get("item_id")
+
+    if not item_id:
+        return jsonify({"success": False, "message": "Item ID is required"}), 400
+
+    try:
+        # Call the delete function (e.g., `delete_inventory_item_from_db`) to delete the item
+        success = delete_inventory_item_from_db(item_id)
+
+        if success:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"success": False, "message": "Failed to delete item"}), 500
+
+    except Exception as e:
+        logging.error(f"Error while deleting item: {e}")
+        return jsonify({"success": False, "message": "Error while deleting item"}), 500
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',debug=True)

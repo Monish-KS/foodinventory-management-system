@@ -5,4 +5,7 @@
     <td class="column4">{{ row['Quantity'] }}</td>
     <td class="column5">{{ row['ExpDate'] }}</td>
     <td class="column6">{{ row['SupplierID'] }}</td>
+     <td class="column7">
+        <button class="delete-button btn btn-danger" data-item-id="{{ row['ItemID'] }}">Delete</button>
+    </td>
 </tr>

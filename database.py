@@ -110,3 +110,15 @@ def update_request_status_in_db(request_id, new_status):
     except Exception as e:
         print(f"Error updating request status: {e}")
         return False
+
+
+def delete_inventory_item_from_db(item_id):
+    try:
+        with engine.connect() as conn:
+            delete_query = text(f"DELETE FROM inventory WHERE ItemID = '{item_id}'")
+            conn.execute(delete_query)
+            conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error deleting item from database: {e}")
+        return False

@@ -49,6 +49,7 @@
 <th class="column4">Quantity</th>
 <th class="column5">ExpDate</th>
 <th class="column6">SupplierID</th>
+<th class="column7">Delete</th>
 </tr>
 </thead>
 <tbody>
@@ -89,6 +90,7 @@
                                     <th>Item Name</th>
                                     <th>Quantity</th>
                                     <th>Status</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -163,6 +165,36 @@
         });
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = button.getAttribute('data-item-id');
+
+            fetch('/delete_inventory_item', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ item_id: itemId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Refresh the page after successful deletion
+                    location.reload();
+                } else {
+                    alert('Failed to delete item');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting item');
+            });
+        });
+    });
+});
+
 </script>
 
 </body>
